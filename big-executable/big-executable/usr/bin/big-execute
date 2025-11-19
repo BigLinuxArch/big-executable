@@ -1,0 +1,63 @@
+#!/bin/bash
+
+export TEXTDOMAINDIR="/usr/share/locale"
+export TEXTDOMAIN=big-executable
+
+Close=$"Fechar"
+Execute=$"Executar"
+ExecuteInTerminal=$"Executar no terminal"
+ExecuteFile=$"Executar arquivo"
+Desc_Part1=$"Prossiga somente se confiar que não se trata de um 
+arquivo malicioso."
+Desc_Part2=$"Atenção, executar esse tipo de arquivo pode danificar o sistema."
+Field=$"Utilizar permissões administrativas"
+Field2=$"Manter o terminal aberto"
+Field3=$"Deseja prosseguir com a execução?"
+
+
+
+set +H
+use_root=$(yad --image=/usr/share/pixmaps/run.svg --image-on-top --form --text "<big><b>$Desc_Part1</b></big>
+<span color='#CC2222'>$Desc_Part2</span>
+" \
+--align=center --field "$Field (root)":CHK \
+--field "$Field2":CHK \
+--field="<b>$Field3</b>
+:LBL" \
+--button=" $Close!gtk-cancel":0 \
+--button=" $Execute!gtk-apply":2 \
+--button=" $ExecuteInTerminal!gtk-execute":4 \
+--center --on-top --borders=20 --title="$ExecuteFile" \
+--window-icon="gtk-execute" \
+--margins=30)
+
+        yadresult=$?
+
+        set -H
+
+        if [ "$yadresult" = "0" ]; then
+            exit
+        fi
+        
+        
+        if [ "$yadresult" = "2" ]; then
+            chmod +x "$*"
+            if [ "$(echo $use_root | cut -f1 -d"|")" = "TRUE" ]; then
+                pkexec env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY KDE_SESSION_VERSION=5 KDE_FULL_SESSION=true "$*"
+            else
+                "$*"
+            fi
+        fi
+
+        if [ "$(echo $use_root | cut -f2 -d"|")" = "TRUE" ]; then
+            NOCLOSE="--noclose"
+        fi
+        
+        if [ "$yadresult" = "4" ]; then
+            chmod +x "$*"
+            if [ "$(echo $use_root | cut -f1 -d"|")" = "TRUE" ]; then
+                pkexec env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY KDE_SESSION_VERSION=5 KDE_FULL_SESSION=true konsole $NOCLOSE -e "$*"
+            else
+                konsole $NOCLOSE -e "$*"
+            fi
+        fi
