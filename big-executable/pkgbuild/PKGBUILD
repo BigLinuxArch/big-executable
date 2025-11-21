@@ -1,13 +1,13 @@
 # Maintainer: Bruno Goncalves <bigbruno@gmail.com>
 
 pkgname=big-executable
-pkgver=$(date +%y.%m.%d)
-pkgrel=$(date +%H%M)
+pkgver=22.08.27
+pkgrel=2357
 arch=('any')
 license=('GPL')
 url="https://github.com/biglinux/big-executable"
 pkgdesc="Execute scripts and binaries with dialog"
-source=("git+https://github.com/biglinux/big-executable.git")
+source=("git+https://github.com/biglinux/big-executable.git#branch=stable-22-08-27f")
 md5sums=(SKIP)
 depends=('yad' 'konsole')
 
